@@ -1,0 +1,65 @@
+﻿@model LibraryUI.Models.RegisterViewModel
+@{
+    ViewBag.Title = "Register";
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+}
+
+<div class="login-page">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <h1>Register</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    @using (Html.BeginForm())
+                    {
+                        @Html.ValidationSummary(true)
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control", required = "Required field", placeholder = "Email" } })
+                                        @Html.ValidationMessageFor(model => model.Email)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        @Html.EditorFor(model => model.FirstName, new { htmlAttributes = new { @class = "form-control", required = "Required field", placeholder = "First Name" } })
+                                        @Html.ValidationMessageFor(model => model.FirstName)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        @Html.EditorFor(model => model.LastName, new { htmlAttributes = new { @class = "form-control", required = "Required field", placeholder = "Last Name" } })
+                                        @Html.ValidationMessageFor(model => model.LastName)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <div class="col-md-6">
+                                        @Html.ActionLink("Back", "LogIn", "Account", null, new { @class = "btn btn-md btn-default btn-block", role = "button" })
+                                    </div>
+                                    <div class="col-md-6">
+                                        <button type="submit" name="Register" class="btn btn-md btn-success btn-block">Register</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

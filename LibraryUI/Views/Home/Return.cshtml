@@ -1,0 +1,38 @@
+﻿@model LibraryUI.Models.HistoryViewModel
+@{
+    ViewBag.Title = "Return Book";
+}
+
+<div class="row">
+    <div class="col-md-6 col-md-offset-3">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <h5>Do you want to return a book?</h5>
+                        <h2>@Model.Book.Name</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            @using (Html.BeginForm())
+            {
+                <div class="row">
+                    <input type="hidden" name="Id" readonly value="@Model.Id">
+                    <input type="hidden" name="BookId" readonly value="@Model.BookId">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <div class="col-md-6">
+                                @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-md btn-default btn-block", role = "button" })
+                            </div>
+                            <div class="col-md-6">
+                                <button type="submit" name="Return" class="btn btn-md btn-success btn-block">Return</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,49 @@
+﻿@model LibraryUI.Models.LoginViewModel
+@{
+    ViewBag.Title = "LogIn";
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+}
+
+<div class="login-page">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <h1>LogIn</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    @using (Html.BeginForm())
+                    {
+                        @Html.ValidationSummary(true)
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control", required = "Required field", placeholder = "Email" } })
+                                        @Html.ValidationMessageFor(model => model.Email)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <div class="col-md-6">
+                                        <button type="submit" name="LogIn" class="btn btn-md btn-success btn-block">LogIn</button>
+                                    </div>
+                                    <div class="col-md-6">
+                                        @Html.ActionLink("Register", "Register", "Account", null, new { @class = "btn btn-md btn-primary btn-block", role = "button" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
