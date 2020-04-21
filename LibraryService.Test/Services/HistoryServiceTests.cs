@@ -83,6 +83,40 @@ namespace LibraryService.Test.Services
             Assert.AreEqual(expectedHistory.Count(), actualHistory.Count());
         }
 
+        [TestMethod]
+        public void HistoryService_Can_Get_User_Active_History()
+        {
+            #region Arrange
+            var id = 1;
+            var expectedHistory = GetHistory().Where(x => x.UserId.Equals(id)).ToList();
+            _mockRepository.Setup(m => m.Get(It.IsAny<Func<History, bool>>(), b => b.Book, u => u.User)).Returns(expectedHistory);
+            var service = new HistoryService(_mockRepository.Object, _mapper);
+            #endregion
+
+            //Act
+            var actualHistory = service.GetUserActiveHistory(id);
+
+            //Assert
+            Assert.AreEqual(expectedHistory.Count(), actualHistory.Count());
+        }
+
+        [TestMethod]
+        public void HistoryService_Can_Get_Book_History()
+        {
+            #region Arrange
+            var id = 1;
+            var expectedHistory = GetHistory().Where(x => x.BookId.Equals(id)).ToList();
+            _mockRepository.Setup(m => m.Get(It.IsAny<Func<History, bool>>(), b => b.Book, u => u.User)).Returns(expectedHistory);
+            var service = new HistoryService(_mockRepository.Object, _mapper);
+            #endregion
+
+            //Act
+            var actualHistory = service.GetBookHistory(id);
+
+            //Assert
+            Assert.AreEqual(expectedHistory.Count(), actualHistory.Count());
+        }
+
         #region TestData
         private static List<History> GetHistory()
         {

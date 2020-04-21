@@ -5,7 +5,6 @@ using LibraryUI.Controllers;
 using LibraryUI.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -17,6 +16,7 @@ namespace LibraryUI.Tests.Controllers
     {
         private Mock<IUserService> _userService;
         private Mock<IRoleService> _roleService;
+        private Mock<ControllerContext> _controllerContext;
         private IMapper _mapper;
 
         [TestInitialize]
@@ -33,6 +33,12 @@ namespace LibraryUI.Tests.Controllers
                 cfg.CreateMap<RoleViewModel, RoleDto>();
             });
             _mapper = mapperConfiguration.CreateMapper();
+            HttpContext.Current = TestData.MockHttpContext();
+            _controllerContext = new Mock<ControllerContext>();
+            _controllerContext.SetupGet(p => p.HttpContext.Session["CurrentUser"])
+                .Returns(TestData.GetUserViewModel().Where(x => x.Id.Equals(TestData.CurrentUserId)).First());
+            _controllerContext.SetupGet(p => p.HttpContext.Session["FullName"])
+                .Returns("Full Name");
         }
 
         [TestMethod]
@@ -58,11 +64,10 @@ namespace LibraryUI.Tests.Controllers
             {
                 Email = "JacobSophia@test.com"
             };
-            var email = "JacobSophia@test.com";
-            var returnUser = GetUsersDto().Where(x => x.Email.Equals(email)).First();
-            _userService.Setup(m => m.GetByEmail(email)).Returns(returnUser);
+            var returnUser = TestData.GetUsersDto().Where(x => x.Email.Equals(user.Email)).First();
+            _userService.Setup(m => m.GetByEmail(user.Email)).Returns(returnUser);
             var controller = new AccountController(_userService.Object, _roleService.Object, _mapper);
-            controller.FakeHttpContext();
+            controller.ControllerContext = _controllerContext.Object;
             #endregion
 
             // Act
@@ -82,8 +87,7 @@ namespace LibraryUI.Tests.Controllers
             {
                 Email = "nonexistent@test.com"
             };
-            var email = "nonexistent@test.com";
-            _userService.Setup(m => m.GetByEmail(email));
+            _userService.Setup(m => m.GetByEmail(user.Email));
             var controller = new AccountController(_userService.Object, _roleService.Object, _mapper);
             #endregion
 
@@ -141,7 +145,7 @@ namespace LibraryUI.Tests.Controllers
             #region Arrange
             var expected = "LogIn";
             var controller = new AccountController(_userService.Object, _roleService.Object, _mapper);
-            controller.FakeHttpContext();
+            controller.ControllerContext = _controllerContext.Object;
             #endregion
 
             // Act
@@ -150,76 +154,6 @@ namespace LibraryUI.Tests.Controllers
             //Assert
             Assert.IsNotNull(result);
             Assert.AreEqual(expected, result.RouteValues["action"]);
-        }
-
-        #region TestData
-        private static List<UserDto> GetUsersDto()
-        {
-            return new List<UserDto>()
-            {
-                new UserDto()
-                {
-                    Id = 1,
-                    FirstName = "Jacob",
-                    LastName = "Sophia",
-                    Email = "JacobSophia@test.com",
-                    RoleId = 1
-                },
-                new UserDto()
-                {
-                    Id = 2,
-                    FirstName = "Mason",
-                    LastName = "Isabella",
-                    Email = "MasonIsabella@test.com",
-                    RoleId = 2
-                },
-            };
-        }
-        #endregion
-    }
-
-    public class MockHttpSession : HttpSessionStateBase
-    {
-        Dictionary<string, object> Session = new Dictionary<string, object>();
-        public override object this[string name]
-        {
-            get { return Session[name]; }
-            set { Session[name] = value; }
-        }
-    }
-
-    public static class FakeContext
-    {
-        public static HttpContextBase FakeHttpContext(this Controller controller)
-        {
-            var context = new Mock<HttpContextBase>();
-            var request = new Mock<HttpRequestBase>();
-            var response = new Mock<HttpResponseBase>();
-            var session = new MockHttpSession() {
-                {
-                    "CurrentUser",
-                    new UserDto()
-                    {
-                        Id = 1,
-                        FirstName = "Jacob",
-                        LastName = "Sophia",
-                        Email = "JacobSophia@test.com",
-                        RoleId = 1
-                    }
-                },
-                {
-                    "FullName",
-                    "Full Name"
-                }
-            };
-            var server = new Mock<HttpServerUtilityBase>();
-
-            context.Setup(ctx => ctx.Request).Returns(request.Object);
-            context.Setup(ctx => ctx.Response).Returns(response.Object);
-            context.Setup(ctx => ctx.Session).Returns(session);
-            context.Setup(ctx => ctx.Server).Returns(server.Object);
-
-            return context.Object;
         }
     }
 }

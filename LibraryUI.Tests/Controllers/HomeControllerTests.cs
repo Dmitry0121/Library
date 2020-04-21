@@ -5,9 +5,8 @@ using LibraryUI.Controllers;
 using LibraryUI.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Web;
 using System.Web.Mvc;
 
 namespace LibraryUI.Tests.Controllers
@@ -17,6 +16,7 @@ namespace LibraryUI.Tests.Controllers
     {
         private Mock<IHistoryService> _historyService;
         private Mock<IBookService> _bookService;
+        private Mock<ControllerContext> _controllerContext;
         private IMapper _mapper;
 
         [TestInitialize]
@@ -34,19 +34,21 @@ namespace LibraryUI.Tests.Controllers
                 cfg.CreateMap<AuthorViewModel, AuthorDto>();
             });
             _mapper = mapperConfiguration.CreateMapper();
+            HttpContext.Current = TestData.MockHttpContext();
+            _controllerContext = new Mock<ControllerContext>();
+            _controllerContext.SetupGet(p => p.HttpContext.Session["CurrentUser"])
+                .Returns(TestData.GetUserViewModel().Where(x => x.Id.Equals(TestData.CurrentUserId)).First());
+            _controllerContext.SetupGet(p => p.HttpContext.Session["FullName"])
+                .Returns("Full Name");
         }
 
         [TestMethod]
         public void HomeController_Can_View_Index()
         {
             #region Arrange
-            var currentUserId = 1;
-            var expectedHistory = GetHistoryDto();
-            _historyService.Setup(m => m.GetUserActiveHistory(currentUserId))
-                .Returns(expectedHistory);
-            var controller = new HomeController(_historyService.Object,
-                _bookService.Object,
-                _mapper);
+            var expectedHistory = TestData.GetHistoryDto();
+            _historyService.Setup(m => m.GetUserActiveHistory(TestData.CurrentUserId)).Returns(expectedHistory);
+            var controller = new HomeController(_historyService.Object, _bookService.Object, _mapper);
             #endregion
 
             // Act
@@ -61,7 +63,7 @@ namespace LibraryUI.Tests.Controllers
         {
             #region Arrange
             var historyId = 1;
-            var history = GetHistoryDto().Where(x => x.Id.Equals(historyId)).First();
+            var history = TestData.GetHistoryDto().Where(x => x.Id.Equals(historyId)).First();
             _historyService.Setup(m => m.Get(historyId)).Returns(history);
             var controller = new HomeController(_historyService.Object, _bookService.Object, _mapper);
             #endregion
@@ -78,7 +80,7 @@ namespace LibraryUI.Tests.Controllers
         {
             #region Arrange
             var expected = "Index";
-            var history = GetHistoryViewModel().First();
+            var history = TestData.GetHistoryViewModel().First();
             _bookService.Setup(m => m.Return(history.BookId, history.Id));
             var controller = new HomeController(_historyService.Object, _bookService.Object, _mapper);
             #endregion
@@ -90,52 +92,5 @@ namespace LibraryUI.Tests.Controllers
             Assert.IsNotNull(result);
             Assert.AreEqual(expected, result.RouteValues["action"]);
         }
-
-        #region TestData
-        private static List<HistoryViewModel> GetHistoryViewModel()
-        {
-            return new List<HistoryViewModel>()
-            {
-                new HistoryViewModel()
-                {
-                    Id = 1,
-                    DateReceiving = DateTime.Now.AddDays(-2),
-                    ReturnDate = null,
-                    BookId = 1,
-                    UserId = 1
-                },
-                new HistoryViewModel()
-                {
-                    Id = 2,
-                    DateReceiving = DateTime.Now.AddDays(-3),
-                    ReturnDate = null,
-                    BookId = 2,
-                    UserId = 1
-                }
-            };
-        }
-        private static List<HistoryDto> GetHistoryDto()
-        {
-            return new List<HistoryDto>()
-            {
-                new HistoryDto()
-                {
-                    Id = 1,
-                    DateReceiving = DateTime.Now.AddDays(-2),
-                    ReturnDate = null,
-                    BookId = 1,
-                    UserId = 1
-                },
-                new HistoryDto()
-                {
-                    Id = 2,
-                    DateReceiving = DateTime.Now.AddDays(-3),
-                    ReturnDate = null,
-                    BookId = 2,
-                    UserId = 1
-                }
-            };
-        }
-        #endregion
     }
 }

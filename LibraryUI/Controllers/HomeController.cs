@@ -15,7 +15,7 @@ namespace LibraryUI.Controllers
         private readonly IMapper _mapper;
 
         public HomeController(IHistoryService historyService,
-            IBookService bookService, 
+            IBookService bookService,
             IMapper mapper)
         {
             _historyService = historyService;
@@ -23,6 +23,7 @@ namespace LibraryUI.Controllers
             _mapper = mapper;
         }
 
+        [HttpGet]
         public ActionResult Index()
         {
             var history = _historyService.GetUserActiveHistory(CurrentUser.Id);
@@ -37,7 +38,7 @@ namespace LibraryUI.Controllers
         public ActionResult Return(int historyId)
         {
             var history = _historyService.Get(historyId);
-            var viewModel = _mapper.Map<HistoryViewModel>(history);         
+            var viewModel = _mapper.Map<HistoryViewModel>(history);
             return View(viewModel);
         }
 

@@ -124,7 +124,7 @@ namespace LibraryService.Test.Services
         }
 
         [TestMethod]
-        public void BookService_Can_Return_Nonexistent_Book()
+        public void BookService_Can_Not_Return_Nonexistent_Book()
         {
             #region Arrange
             var bookId = 1;

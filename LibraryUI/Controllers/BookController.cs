@@ -48,7 +48,7 @@ namespace LibraryUI.Controllers
             _bookService.Give(item.Id, CurrentUser.Id);
             return RedirectToAction("Index");
         }
-        
+
         [HttpGet]
         public ActionResult BookHistory(int bookId)
         {
